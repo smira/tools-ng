@@ -1,0 +1,11 @@
+name: tools
+dependencies:
+  - stage: golang
+finalize:
+  - from: /toolchain
+    to: /toolchain
+variant: scratch
+shell: /toolchain/bin/bash
+steps:
+  - prepare: |
+      cp /pkg/files/adjust.sh ${TOOLCHAIN}/bin

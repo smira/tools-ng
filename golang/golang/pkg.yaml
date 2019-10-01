@@ -1,0 +1,41 @@
+name: golang
+install:
+  - make
+dependencies:
+  - image: docker.io/autonomy/toolchain:d1f6110
+  - stage: golang-bootstrap
+finalize:
+  - from: /rootfs
+    to: /
+steps:
+  - sources:
+      - url: https://dl.google.com/go/go1.12.9.src.tar.gz
+        destination: go1.12.9.src.tar.gz
+        sha256: ab0e56ed9c4732a653ed22e232652709afbf573e710f56a07f7fdeca578d62fc
+        sha512: 57041e7fb767f528aa9fc2592d205d3a7c120c73f92dc8d91f17f816e12aa6152c8421b333081800a5f50b1bb656f203a25faf8ed92c69a6ec164ce0a5619c13
+
+    prepare: |
+      tar -xzf go1.12.9.src.tar.gz --strip-components=1
+
+    build: |
+      export CGO_ENABLED=0
+      export GOROOT_BOOTSTRAP="${TOOLCHAIN}/go_bootstrap"
+
+      export GOROOT_FINAL="${TOOLCHAIN}/go"
+      cd src
+      sh make.bash
+
+    install: |
+      export GOROOT_FINAL="${TOOLCHAIN}/go"
+      rm -rf pkg/obj
+      rm -rf pkg/bootstrap
+      rm -f pkg/tool/*/api
+      find src \( -type f -a -name "*_test.go" \) \
+      -exec rm -rf \{\} \+
+      find src \( -type d -a -name "testdata" \) \
+      -exec rm -rf \{\} \+
+      find src -type f -a \( -name "*.bash" -o -name "*.rc" -o -name "*.bat" \) \
+      -exec rm -rf \{\} \+
+
+      mkdir -p "/rootfs${GOROOT_FINAL}"
+      mv * "/rootfs${GOROOT_FINAL}"
