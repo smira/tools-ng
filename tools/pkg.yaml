@@ -1,7 +1,10 @@
 name: tools
 dependencies:
-  - stage: golang
   - stage: argp-standalone
+  - stage: bash
+  - stage: coreutils
+  - stage: golang
+  - image: docker.io/autonomy/toolchain:d1f6110
 finalize:
   - from: /toolchain
     to: /toolchain
