@@ -1,6 +1,7 @@
 name: tools
 dependencies:
   - stage: golang
+  - stage: argp-standalone
 finalize:
   - from: /toolchain
     to: /toolchain
